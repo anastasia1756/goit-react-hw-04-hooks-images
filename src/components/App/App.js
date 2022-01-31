@@ -16,6 +16,7 @@ export const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [imageForModal, setImageForModal] = useState("");
   const [error, setError] = useState("");
+  const [totalHits, setTotalHits] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
@@ -23,7 +24,11 @@ export const App = () => {
         if (value === "") {
           return;
         }
-        const newImages = await getImages(value, page);
+
+        const response = await getImages(value, page);
+        const newImages = response.hits;
+        setTotalHits(response.totalHits);
+
         newImages.length === 0 && toast.error("No such picture");
         setLoading(true);
         setLoading(false);
@@ -48,6 +53,7 @@ export const App = () => {
     setValue(image);
   };
   const lengthOfImages = images.length;
+
   return (
     <AppWpapper>
       {showModal && (
@@ -68,7 +74,7 @@ export const App = () => {
         />
       )}
 
-      {lengthOfImages > 0 && lengthOfImages === 12 && !loading && (
+      {lengthOfImages > 0 && !loading && images.length < totalHits && (
         <Button onClick={loadMoreBtn} loading={loading} />
       )}
 
